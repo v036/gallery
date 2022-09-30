@@ -8,27 +8,80 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="gallery.css">
 </head>
-<body>
+<body class="mx-auto">
     
     <!-- Bootstrap & Jquery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+    
+    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center">
+        <div class="col-md-5 p-lg-5 mx-auto my-5">
+          <h1 class="display-4 fw-normal">Gallery</h1>
+          <p class="lead fw-normal">Press below to upload your pictures.</p>
+          <input class="form-control" type="file" id="directory" webkitdirectory directory multiple>
+        </div>
+        <div class="product-device shadow-sm d-none d-md-block"></div>
+        <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
+    </div>
+
+    
+
+    <div class="container-fluid mx-auto" id="main">
+    </div>
 
     <script>
-        var directory = "https://v036.github.io/gallery/data/";
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open('GET', directory, false); // false for synchronous request
-        xmlHttp.send(null);
-        var ret = xmlHttp.responseText;
-        var fileList = ret.split('\n');
-        for (i = 0; i < fileList.length; i++) {
-            var fileinfo = fileList[i].split(' ');
-            if (fileinfo[0] == '201:') {
-                document.write(fileinfo[1] + "<br>");
-                document.write('<img src=\"' + directory + fileinfo[1] + '\"/>');
+
+        var rows = 10
+
+        $("#directory").change(function(event) {
+            const files = event.target.files
+            var images = []
+            var index = 0
+            var imagerows = 0
+
+            for (var i = 0; i < files.length; i++) {
+                const file = files[i]
+
+                const accepted = ['image/gif', 'image/jpeg', 'image/jpg', 'image/png']
+                if (accepted.includes(file.type))  {
+                    images.push(i)
+                }
             }
-        }
+
+            for (var i = 0; i < (Math.abs(images.length / rows)); i++) {
+                $("#main").append("<div id=\"imagerow_" + i + "\" class=\"row\"></div>")
+            }
+
+            for (var i = 0; i < images.length; i++) {
+                const file = files[images[i]]
+                var url = URL.createObjectURL(file)
+
+                if (index >= rows) {
+                    imagerows++
+                    index = 1
+                } else {
+                    index++
+                }
+
+                $("#imagerow_" + imagerows).append(`
+            
+                    <div class="py-3 test"  id="object_` + i + `" style="width: ` + Math.abs(100 / rows) + `%;">
+                        <div>
+                            <div class="card shadow-sm">
+                                <img src="` + url + `" alt="` + file.name + ` id="image_` + i + `">
+                                <div class="card-body">
+                                    <p class="card-text" style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">` + file.name + `</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            
+                `)
+            }
+        })
     </script>
 </body>
 </html>
